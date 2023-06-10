@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\WeatherApi.Dto\WeatherApi.Dto.csproj" />
+    </ItemGroup>
+
 </Project>
