@@ -24,7 +24,6 @@
 
     <ItemGroup>
       <Folder Include="OpenMeteo\" />
-      <Folder Include="Repositories\" />
       <Folder Include="Services\" />
     </ItemGroup>
 

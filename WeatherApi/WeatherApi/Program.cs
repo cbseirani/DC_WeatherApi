@@ -1,4 +1,10 @@
+using WeatherApi.Repositories;
+using WeatherApi.Repositories.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSingleton(typeof(IConfiguration), builder.Configuration);
+builder.Services.AddSingleton<IWeatherRepository, WeatherRepository>();
 
 
 builder.Services.AddControllers();
