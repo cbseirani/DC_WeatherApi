@@ -1,6 +1,8 @@
 # DC_WeatherApi
 API for gathering and storing weather forecasts by location coordinates
 
+I use Rider IDE (Early Access EAP is free for a while): https://www.jetbrains.com/rider/
+
 Web API is built in .net 7 so you'll need the latest .net 7 hosting bundle: https://dotnet.microsoft.com/en-us/download/dotnet/7.0
 
 I chose to use Azure CosmosDB due to how you can partition groups of location forecasts by user. Update appsettings with the approriate info:
@@ -14,5 +16,7 @@ There are basic happy path unit tests - a decent amount of coverage:
 
 ![image](https://github.com/cbseirani/DC_WeatherApi/assets/34148393/67e9ad62-40dd-4179-a089-33c61388e8d7)
 
+
+You can run/debug locally
 
 
