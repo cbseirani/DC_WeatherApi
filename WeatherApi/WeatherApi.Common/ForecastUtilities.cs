@@ -10,6 +10,8 @@ public static class ForecastUtilities
     public static (double, double) GetCoordinatesFromKey(string key)
     {
         var arr = key.Split(',');
-        return (double.Parse(arr[0].Remove('(')), double.Parse(arr[1].Remove(')')));
+        var latitude = double.Parse(arr[0].Replace("(", string.Empty));
+        var longitude = double.Parse(arr[1].Replace(")", string.Empty));
+        return (latitude, longitude);
     }
 }

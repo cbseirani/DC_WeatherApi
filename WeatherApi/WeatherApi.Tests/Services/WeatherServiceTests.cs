@@ -18,7 +18,7 @@ public class WeatherServiceTests
     public async Task<bool> GetWithPreviousLocations_Expected()
     {
         _weatherRepository
-            .Setup(x => x.Get())
+            .Setup(x => x.Get(It.IsAny<Guid>()))
             .ReturnsAsync(new List<ForecastDto>()
             {
                 new ForecastDto()
@@ -32,7 +32,7 @@ public class WeatherServiceTests
             });
         
         _weatherRepository
-            .Setup(x => x.Save(It.IsAny<ForecastDto>()))
+            .Setup(x => x.Save(It.IsAny<Guid>(), It.IsAny<ForecastDto>()))
             .ReturnsAsync(new ForecastDto
             {
 

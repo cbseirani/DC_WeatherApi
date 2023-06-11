@@ -4,9 +4,9 @@ namespace WeatherApi.Repositories.Interfaces;
 
 public interface IWeatherRepository
 {
-    Task<IEnumerable<ForecastDto>> Get();
+    Task<IEnumerable<ForecastDto>> Get(Guid userGuid);
     
-    Task<ForecastDto> Save(ForecastDto forecast);
+    Task<ForecastDto> Save(Guid userGuid, ForecastDto forecast);
     
-    Task<bool> Delete(string forecastKey);    
+    Task<bool> Delete(Guid userGuid, string forecastKey);    
 }

@@ -1,7 +1,5 @@
-using System.Text.Json.Serialization;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using WeatherApi.Dto;
 using WeatherApi.Repositories.Interfaces;
 
@@ -12,7 +10,6 @@ public class WeatherRepository : IWeatherRepository
     private readonly CosmosClient _cosmosClient;
     private readonly string? _databaseId;
     private readonly string? _containerId;
-    private static readonly Guid UserGuid = Guid.NewGuid(); // TODO: track user context so we can group locations by user in cosmos partitions
 
     public WeatherRepository(IConfiguration configuration)
     {
@@ -21,29 +18,31 @@ public class WeatherRepository : IWeatherRepository
         _cosmosClient = new CosmosClient(connectionString: configuration["CosmosDbConnString"]);
     }
     
-    public async Task<IEnumerable<ForecastDto>> Get()
+    public async Task<IEnumerable<ForecastDto>> Get(Guid userGuid)
     {
         var container = await GetCosmosContainer();
-        return container.GetItemLinqQueryable<ForecastDto>().ToList();
+        return container
+            .GetItemLinqQueryable<ForecastDto>(allowSynchronousQueryExecution: true)
+            .Where(x => x.PartitionKey == GeneratePartitionKey(userGuid));
     }
 
-    public async Task<ForecastDto> Save(ForecastDto forecast)
+    public async Task<ForecastDto> Save(Guid userGuid, ForecastDto forecast)
     {
         var container = await GetCosmosContainer();
-        forecast.PartitionKey = GeneratePartitionKey();
+        forecast.PartitionKey = GeneratePartitionKey(userGuid);
         return await container.UpsertItemAsync(forecast, new PartitionKey(forecast.PartitionKey));
     }
 
-    public async Task<bool> Delete(string forecastKey)
+    public async Task<bool> Delete(Guid userGuid, string forecastKey)
     {
         var container = await GetCosmosContainer();
-        await container.DeleteItemAsync<ForecastDto>(forecastKey, new PartitionKey(GeneratePartitionKey()));
+        await container.DeleteItemAsync<ForecastDto>(forecastKey, new PartitionKey(GeneratePartitionKey(userGuid)));
         return true;
     }
 
-    private static string GeneratePartitionKey()
+    private static string GeneratePartitionKey(Guid userGuid)
     {
-        return $"/{UserGuid.ToString()}";
+        return $"/{userGuid.ToString()}";
     }
     
     private async Task<Container> GetCosmosContainer()
