@@ -11,7 +11,7 @@ public class WeatherController : ControllerBase
     private readonly IWeatherService _weatherService;
     
     // TODO: track user context so we can group forecasts by user in cosmos partitions
-    private static readonly Guid UserGuid = Guid.NewGuid();
+    private static readonly Guid UserGuid = Guid.Parse("E9BE9F22-3EA7-4FAA-ACBD-091B09A656B9");
 
     public WeatherController(IWeatherService weatherService) => _weatherService = weatherService;
     
