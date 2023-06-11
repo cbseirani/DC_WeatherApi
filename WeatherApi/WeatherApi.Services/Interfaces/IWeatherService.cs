@@ -4,9 +4,9 @@ namespace WeatherApi.Services.Interfaces;
 
 public interface IWeatherService
 {
-    Task<IEnumerable<ForecastDto>> Get();
+    Task<IEnumerable<ForecastDto>> Get(Guid userGuid);
     
-    Task<ForecastDto> Save(CoordinatesDto coordinates);
+    Task<ForecastDto> Save(Guid userGuid, CoordinatesDto coordinates);
     
-    Task<bool> Delete(string forecastKey);    
+    Task<bool> Delete(Guid userGuid, string forecastKey);    
 }

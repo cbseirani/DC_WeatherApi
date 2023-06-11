@@ -9,6 +9,9 @@ namespace WeatherApi.Controllers;
 public class WeatherController : ControllerBase
 {
     private readonly IWeatherService _weatherService;
+    
+    // TODO: track user context so we can group forecasts by user in cosmos partitions
+    private static readonly Guid UserGuid = Guid.NewGuid();
 
     public WeatherController(IWeatherService weatherService) => _weatherService = weatherService;
     
@@ -16,21 +19,20 @@ public class WeatherController : ControllerBase
     // Returns 7 day forecast for a single location
     [HttpGet]
     public Task<ForecastDto> Get(double latitude, double longitude) =>
-        _weatherService.Save(new CoordinatesDto() { Latitude = latitude, Longitude = longitude });
+        _weatherService.Save(UserGuid, new CoordinatesDto() { Latitude = latitude, Longitude = longitude });
     
     // GET all recent forecasts for all locations
     // Returns 7 day forecast for each location
     [HttpGet("Locations")]
-    public Task<IEnumerable<ForecastDto>> Get() => _weatherService.Get();
+    public Task<IEnumerable<ForecastDto>> Get() => _weatherService.Get(UserGuid);
     
     // POST new location
     // Returns 7 day forecast for a single location
     [HttpPost]
-    public Task<ForecastDto> Save([FromBody] CoordinatesDto coordinates) =>
-        _weatherService.Save(coordinates);
+    public Task<ForecastDto> Save([FromBody] CoordinatesDto coordinates) => _weatherService.Save(UserGuid, coordinates);
     
     // DELETE location
     // Returns a success flag
     [HttpDelete]
-    public Task<bool> Delete(string forecastKey) => _weatherService.Delete(forecastKey);
+    public Task<bool> Delete(string forecastKey) => _weatherService.Delete(UserGuid, forecastKey);
 }

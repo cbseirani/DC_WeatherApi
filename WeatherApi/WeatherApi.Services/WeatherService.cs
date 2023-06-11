@@ -12,9 +12,6 @@ public class WeatherService : IWeatherService
     private readonly IWeatherRepository _weatherRepository;
     private readonly IOpenMeteoClient _openMeteoClient;
     private readonly ILogger _logger;
-    
-    // TODO: track user context so we can group forecasts by user in cosmos partitions
-    private static readonly Guid UserGuid = Guid.NewGuid();
 
     public WeatherService(IWeatherRepository weatherRepository, IOpenMeteoClient openMeteoClient, ILogger logger)
     {
@@ -23,20 +20,20 @@ public class WeatherService : IWeatherService
         _logger = logger;
     }
 
-    public async Task<IEnumerable<ForecastDto>> Get()
+    public async Task<IEnumerable<ForecastDto>> Get(Guid userGuid)
     {
-        // TODO : if locations list gets big we will need to refactor to execute multiple requests parallel 
-        var previousForecasts = await _weatherRepository.Get(UserGuid);
+        // TODO : if locations list gets big we will need to refactor to execute multiple requests in parallel 
+        var previousForecasts = await _weatherRepository.Get(userGuid);
         var forecasts = new List<ForecastDto>();
         foreach (var forecast in previousForecasts)
         {
-            forecasts.Add(await Save(new CoordinatesDto{Latitude = forecast.Location.Latitude, Longitude = forecast.Location.Longitude}));
+            forecasts.Add(await Save(userGuid, new CoordinatesDto{Latitude = forecast.Location.Latitude, Longitude = forecast.Location.Longitude}));
         }
 
         return forecasts;
     }
 
-    public async Task<ForecastDto> Save(CoordinatesDto coordinates)
+    public async Task<ForecastDto> Save(Guid userGuid, CoordinatesDto coordinates)
     {
         var forecast = await _openMeteoClient.RequestForecast(coordinates);
         if (forecast is null)
@@ -46,13 +43,13 @@ public class WeatherService : IWeatherService
         }
         
         _logger.Information("Storing forecast in CosmosDB for lat: {0} long: {1}", coordinates.Latitude, coordinates.Longitude);
-        return await _weatherRepository.Save(UserGuid, forecast);
+        return await _weatherRepository.Save(userGuid, forecast);
     }
 
-    public async Task<bool> Delete(string forecastKey)
+    public async Task<bool> Delete(Guid userGuid, string forecastKey)
     {
         var (latitude, longitude) = ForecastUtilities.GetCoordinatesFromKey(forecastKey);
         _logger.Information("Deleting forecast in CosmosDB for lat: {0} long: {1}", latitude, longitude);
-        return await _weatherRepository.Delete(UserGuid, forecastKey);
+        return await _weatherRepository.Delete(userGuid, forecastKey);
     }
 }
