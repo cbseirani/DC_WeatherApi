@@ -1,4 +1,5 @@
 using Moq;
+using WeatherApi.Common;
 using WeatherApi.Controllers;
 using WeatherApi.Dto;
 using WeatherApi.Services.Interfaces;
@@ -9,6 +10,7 @@ namespace WeatherApi.Tests.Controllers;
 public class WeatherControllerTests
 {
     private readonly Mock<IWeatherService> _weatherService = new();
+    private static readonly Guid UserGuid = Guid.NewGuid();
     
     [Fact]
     public async Task<bool> GetForecast_Expected()
@@ -43,7 +45,8 @@ public class WeatherControllerTests
             .Setup(x => x.Save(It.IsAny<Guid>(),It.IsAny<CoordinatesDto>()))
             .ReturnsAsync(new ForecastDto());
 
-        var response = await CreateController().Get();
+        var coordinates = new CoordinatesDto { Latitude = 52.52, Longitude = 14.14 };
+        var response = await CreateController().Save(coordinates);
         
         Assert.NotNull(response);
         return true;
@@ -56,9 +59,10 @@ public class WeatherControllerTests
             .Setup(x => x.Delete(It.IsAny<Guid>(), It.IsAny<string>()))
             .ReturnsAsync(true);
 
-        var response = await CreateController().Get();
+        var key = ForecastUtilities.GenerateCoordinatesKey(52.52, 14.14);
+        var response = await CreateController().Delete(key);
         
-        Assert.NotNull(response);
+        Assert.True(response);
         return true;
     }
 

@@ -13,6 +13,7 @@ public class WeatherServiceTests
     private readonly Mock<IWeatherRepository> _weatherRepository = new();
     private readonly Mock<IOpenMeteoClient> _openMeteoClient = new();
     private readonly Mock<ILogger> _logger = new();
+    private static readonly Guid UserGuid = Guid.NewGuid();
     
     [Fact]
     public async Task<bool> GetWithPreviousLocations_Expected()
@@ -46,7 +47,7 @@ public class WeatherServiceTests
             });
         
 
-        var response = await CreateService().Get();
+        var response = await CreateService().Get(UserGuid);
         
         Assert.NotNull(response);
         return true;
