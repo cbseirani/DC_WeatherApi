@@ -17,7 +17,12 @@ There are basic happy path unit tests - a decent amount of coverage:
 ![image](https://github.com/cbseirani/DC_WeatherApi/assets/34148393/67e9ad62-40dd-4179-a089-33c61388e8d7)
 
 
-You can run/debug locally and use swagger to test the API:
+Run/debug locally using the IIS Express configration(for windows users):
+
+![image](https://github.com/cbseirani/DC_WeatherApi/assets/34148393/06e6f8ad-9bd0-47eb-bad6-dadf510a1794)
+
+
+Swagger to test the API:
 
 ![image](https://github.com/cbseirani/DC_WeatherApi/assets/34148393/6668169c-5b3a-4af2-aae1-5baa12e7991b)
 
