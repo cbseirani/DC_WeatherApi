@@ -12,7 +12,7 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateLogger();
 
-// TODO: create/register middleware for token auth
+// TODO: create/register middleware for token auth and user context/session
 
 builder.Services.AddSingleton(Log.Logger);
 builder.Services.AddSingleton(typeof(IConfiguration), builder.Configuration);

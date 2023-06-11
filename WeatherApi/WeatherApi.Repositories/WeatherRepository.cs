@@ -1,5 +1,7 @@
+using System.Text.Json.Serialization;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using WeatherApi.Dto;
 using WeatherApi.Repositories.Interfaces;
 
@@ -28,14 +30,20 @@ public class WeatherRepository : IWeatherRepository
     public async Task<ForecastDto> Save(ForecastDto forecast)
     {
         var container = await GetCosmosContainer();
-        return await container.UpsertItemAsync(forecast, new PartitionKey(UserGuid.ToString()));
+        forecast.PartitionKey = GeneratePartitionKey();
+        return await container.UpsertItemAsync(forecast, new PartitionKey(forecast.PartitionKey));
     }
 
     public async Task<bool> Delete(string forecastKey)
     {
         var container = await GetCosmosContainer();
-        await container.DeleteItemAsync<ForecastDto>(forecastKey, new PartitionKey(UserGuid.ToString()));
+        await container.DeleteItemAsync<ForecastDto>(forecastKey, new PartitionKey(GeneratePartitionKey()));
         return true;
+    }
+
+    private static string GeneratePartitionKey()
+    {
+        return $"/{UserGuid.ToString()}";
     }
     
     private async Task<Container> GetCosmosContainer()

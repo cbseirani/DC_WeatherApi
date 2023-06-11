@@ -1,22 +1,55 @@
+using Serilog;
+using WeatherApi.Common;
 using WeatherApi.Dto;
+using WeatherApi.OpenMeteo.Interfaces;
+using WeatherApi.Repositories.Interfaces;
 using WeatherApi.Services.Interfaces;
 
 namespace WeatherApi.Services;
 
 public class WeatherService : IWeatherService
 {
-    public Task<IEnumerable<ForecastDto>> Get()
+    private readonly IWeatherRepository _weatherRepository;
+    private readonly IOpenMeteoClient _openMeteoClient;
+    private readonly ILogger _logger;
+
+    public WeatherService(IWeatherRepository weatherRepository, IOpenMeteoClient openMeteoClient, ILogger logger)
     {
-        throw new NotImplementedException();
+        _weatherRepository = weatherRepository;
+        _openMeteoClient = openMeteoClient;
+        _logger = logger;
     }
 
-    public Task<ForecastDto> Save(CoordinatesDto coordinates)
+    public async Task<IEnumerable<ForecastDto>> Get()
     {
-        throw new NotImplementedException();
+        // TODO : if locations list gets big we will need to refactor to execute multiple requests parallel 
+        var previousForecasts = await _weatherRepository.Get();
+        var forecasts = new List<ForecastDto>();
+        foreach (var forecast in previousForecasts)
+        {
+            forecasts.Add(await Save(new CoordinatesDto{Latitude = forecast.Location.Latitude, Longitude = forecast.Location.Longitude}));
+        }
+
+        return forecasts;
     }
 
-    public Task<bool> Delete(string forecastKey)
+    public async Task<ForecastDto> Save(CoordinatesDto coordinates)
     {
-        throw new NotImplementedException();
+        var forecast = await _openMeteoClient.RequestForecast(coordinates);
+        if (forecast is null)
+        {
+            _logger.Error("Location Forecast was not retrieved for lat: {0} long: {1}", coordinates.Latitude, coordinates.Longitude);
+            throw new Exception("Location Forecast was not retrieved");
+        }
+        
+        _logger.Information("Storing forecast in CosmosDB for lat: {0} long: {1}", coordinates.Latitude, coordinates.Longitude);
+        return await _weatherRepository.Save(forecast);
+    }
+
+    public async Task<bool> Delete(string forecastKey)
+    {
+        var (latitude, longitude) = ForecastUtilities.GetCoordinatesFromKey(forecastKey);
+        _logger.Information("Deleting forecast in CosmosDB for lat: {0} long: {1}", latitude, longitude);
+        return await _weatherRepository.Delete(forecastKey);
     }
 }

@@ -8,6 +8,8 @@
 
     <ItemGroup>
       <ProjectReference Include="..\WeatherApi.Dto\WeatherApi.Dto.csproj" />
+      <ProjectReference Include="..\WeatherApi.OpenMeteo\WeatherApi.OpenMeteo.csproj" />
+      <ProjectReference Include="..\WeatherApi.Repositories\WeatherApi.Repositories.csproj" />
     </ItemGroup>
 
 </Project>

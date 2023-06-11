@@ -26,7 +26,7 @@ public static class OpenMeteoUtilities
         // TODO : use mapster/automapper
         var mappedForecast = new ForecastDto
         {
-            ForecastKey = ForecastUtilities.GenerateCoordinateKey(forecast.latitude, forecast.longitude),
+            ForecastKey = ForecastUtilities.GenerateCoordinatesKey(forecast.latitude, forecast.longitude),
             Location = new CoordinatesDto { Latitude = forecast.latitude, Longitude = forecast.longitude },
             TimeZone = timeZone,
             Elevation = forecast.elevation,
