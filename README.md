@@ -5,6 +5,8 @@ I use Rider IDE (Early Access EAP is free for a while): https://www.jetbrains.co
 
 Web API is built in .net 7 so you'll need the latest .net 7 hosting bundle: https://dotnet.microsoft.com/en-us/download/dotnet/7.0
 
+Open Meteo is the weather forecast provider: https://open-meteo.com/
+
 I chose to use Azure CosmosDB due to how you can partition groups of location forecasts by user. Update appsettings with the approriate info:
 ![image](https://github.com/cbseirani/DC_WeatherApi/assets/34148393/5b188998-d3d6-47cf-824e-1728617d1a45)
 
