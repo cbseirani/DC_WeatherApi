@@ -10,6 +10,7 @@ public class WeatherRepository : IWeatherRepository
     private readonly CosmosClient _cosmosClient;
     private readonly string? _databaseId;
     private readonly string? _containerId;
+    private static readonly Guid UserGuid = Guid.NewGuid(); // TODO: track user context so we can group locations by user in cosmos partitions
 
     public WeatherRepository(IConfiguration configuration)
     {
@@ -27,19 +28,14 @@ public class WeatherRepository : IWeatherRepository
     public async Task<ForecastDto> Save(ForecastDto forecast)
     {
         var container = await GetCosmosContainer();
-        return await container.UpsertItemAsync(forecast, GeneratePartitionKey(forecast.ForecastKey));
+        return await container.UpsertItemAsync(forecast, new PartitionKey(UserGuid.ToString()));
     }
 
     public async Task<bool> Delete(string forecastKey)
     {
         var container = await GetCosmosContainer();
-        await container.DeleteItemAsync<ForecastDto>(forecastKey, GeneratePartitionKey(forecastKey));
+        await container.DeleteItemAsync<ForecastDto>(forecastKey, new PartitionKey(UserGuid.ToString()));
         return true;
-    }
-
-    private PartitionKey GeneratePartitionKey(string forecastKey)
-    {
-        return new PartitionKey(string.Concat(forecastKey.AsSpan(0, 2), forecastKey[^2..].Remove('.')));
     }
     
     private async Task<Container> GetCosmosContainer()

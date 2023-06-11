@@ -23,7 +23,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="OpenMeteo\" />
       <Folder Include="Services\" />
     </ItemGroup>
 
